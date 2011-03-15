@@ -31,6 +31,21 @@
           },
         ];
 
+        function createSources() {
+          video.innerHTML = '';
+          var source = document.createElement('source');
+          source.src = document.getElementById('video-source').value;
+          video.appendChild(source);
+          $('.video-source-textbox').each(function(i,e) {
+            if (this.value) {
+              source = document.createElement('source');
+              source.src = this.value;
+              video.appendChild(source);
+            } //if
+          });
+          video.innerHTML += 'Your browser does not support the video tag.';
+        } //createSources
+
         function createOutput(newVideo) {
           var textarea = document.getElementById('embed-code');
           var div = document.getElementById('preview-viewport');
@@ -39,9 +54,7 @@
               div.removeChild(div.children[0]);
             } //if
             video = document.createElement('video');
-            var source = document.createElement('source');
-            source.src = document.getElementById('video-source').value;
-            video.appendChild(source);
+            createSources();   
             div.appendChild(video);
           } //if
           for (var i=0; i<options.length; ++i) {
@@ -100,6 +113,15 @@
           });
         });
 
+        $('.video-source-textbox').change(function() {
+          createSources();
+          createOutput();
+        });
+
+        $('#video-source').change(function() {
+          createOutput();
+        });
+
         createOutput(true);
       });
     </script>
@@ -114,7 +136,9 @@
         <li class="rollout-container">
           <a class="rollout-button">Enter a URL to Embed</a>: <input type="text" id="video-source" value="http://popcornjs.org/tryme.ogv" /><br />
           <div class="rollout-content">
-            Something about embedding &amp; urls.
+            <div class="video-source">iOS Support <input type="text" class="video-source-textbox" id="video-source-ios"/></div>
+            <div class="video-source">Chrome/Firefox Support <input type="text" class="video-source-textbox" id="video-source-chrome-ff"/></div>
+            <div class="video-source">Firefox/Opera Support <input type="text" class="video-source-textbox" id="video-source-ff-opera"/></div>
           </div>
         </li>
         <li class="rollout-container">

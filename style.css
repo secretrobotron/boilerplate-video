@@ -91,6 +91,7 @@ input[type=checkbox] {
   border-radius: 6px;
   padding: 5px;
   width: 650px;
+  position: relative;
 }
 
 .option-container:hover {
@@ -104,6 +105,16 @@ input[type=checkbox] {
 .option-text:hover {
   cursor: pointer;
   text-decoration: underline;
+}
+
+.video-source {
+  position: relative;
+}
+
+.video-source-textbox {
+  position: absolute;
+  top: 1px;
+  right: 0px;
 }
 
 video {
