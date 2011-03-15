@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Boilerplate Video</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery-1.5.1.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var video;
+
+        var options = [
+          {
+            title: 'Controls',
+            include: function(video) {
+              video.controls = 'true';
+            },
+            disclude: function(video) {
+              video.controls = undefined;
+            },
+            state: true
+          },
+          {
+            title: 'Autoplay',
+            include: function(video) {
+              video.autoplay = 'true';
+            },
+            disclude: function(video) {
+              video.autoplay = undefined;
+            },
+            state: false
+          },
+        ];
+
+        function createOutput(newVideo) {
+          var textarea = document.getElementById('embed-code');
+          var div = document.getElementById('preview-viewport');
+          if (newVideo) {
+            if (div.children.length > 0) {
+              div.removeChild(div.children[0]);
+            } //if
+            video = document.createElement('video');
+            var source = document.createElement('source');
+            source.src = document.getElementById('video-source').value;
+            video.appendChild(source);
+            div.appendChild(video);
+          } //if
+          for (var i=0; i<options.length; ++i) {
+            var option = options[i];
+            if (option.state) {
+              option.include(video);
+            }
+            else {
+              option.disclude(video);
+            } //if
+          } //for
+          var output = div.innerHTML;
+          output = output.replace(/ tabindex="\d"/i, '');
+          textarea.innerHTML = output;
+        } //createOutput
+
+        for (var i=0; i<options.length; ++i) {
+          (function() {
+            var option = options[i];
+            var element = document.createElement('div');
+            element.className = 'option-container';
+            var checkbox = document.createElement('span');
+            checkbox.className = 'option-checkbox';
+            checkbox.innerHTML = '&nbsp;&#x2713; &nbsp;';
+            checkbox.style.color = '#111';
+            element.appendChild(checkbox);
+            var text = document.createElement('span');
+            text.innerHTML = option.title;
+            text.className = 'option-text';
+            element.appendChild(text);
+            function clickFn(forceState) {
+              if(forceState === false || (forceState === undefined && option.state === true)) {
+                checkbox.style.color = '#111';
+                option.state = false;
+              }
+              else if (forceState === true || (forceState === undefined && option.state === false)) {
+                checkbox.style.color = '#aaa';
+                option.state = true;
+              } //if
+            } //clickFn
+            $(element).click(function() {
+              clickFn();
+              createOutput();
+            });
+            clickFn(option.state);
+            $('#options-rollout').append(element);
+          })();
+        } //for
+
+        $('.rollout-container').each(function(i, e) {
+          var content = $(this).children('.rollout-content');
+          var button = $(this).children('.rollout-button');
+          //content.hide();
+          button.click(function() {
+            content.toggle('fast');
+          });
+        });
+
+        createOutput(true);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="title" class="foreground">
+      <h1>Boilerplate Video</h1>
+      <h2>In 3 Easy Steps</h2>
+    </div>
+    <div id="main-list" class="foreground">
+      <ol>
+        <li class="rollout-container">
+          <a class="rollout-button">Enter a URL to Embed</a>: <input type="text" id="video-source" value="http://popcornjs.org/tryme.ogv" /><br />
+          <div class="rollout-content">
+            Something about embedding &amp; urls.
+          </div>
+        </li>
+        <li class="rollout-container">
+          <a class="rollout-button">Choose Your Options</a>
+          <div id="options-rollout" class="rollout-content">
+          </div>
+        </li>
+        <li class="rollout-container">
+          <a class="rollout-button">Copy &amp; Paste the Code</a>
+          <div class="rollout-content">
+            <textarea id="embed-code"></textarea>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div id="preview"><span>Preview</span><br /><div id="preview-viewport"></div></div>
+    <!--<a href="http://mozilla.org"><img id="moz-dino" src="images/mozilla-dino.png" /></a>-->
+    <a href="http://mozilla.org"><img id="moz-logo" src="images/mozilla-white.png" /></a>
+    <a href="http://webmademovies.org"><img id="wmm-logo" src="images/wmm-ticket.png" /></a>
+  </body>
+</html>

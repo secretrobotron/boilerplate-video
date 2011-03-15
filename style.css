@@ -1,0 +1,112 @@
+body {
+  background-color: #000; 
+  color: #fff;
+  font: 24pt helvetica,arial,freesans,sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #aa0022;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 250%;
+  line-height: 0.5em;
+}
+
+h2 {
+  font-size: 150%;
+  color: #888;
+  line-height: 0.5em;
+}
+
+input {
+  border: 2px solid #888;
+  position: relative;
+  top: -0.35em;
+  border-radius: 2px;
+}
+
+input[type=text] {
+  width: 400px;
+}
+
+input[type=checkbox] {
+  background: transparent;
+  color: #888;
+  left: 50px;
+}
+
+.rollout-button:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#main-list {
+  margin-left: 1em;
+}
+
+.foreground {
+  position: relative;
+  z-index: 10;
+}
+
+#moz-dino {
+  position: absolute;
+  z-index: 1;
+  bottom: 10px;
+  right: 10px;
+}
+
+#wmm-logo {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  right: 0px;
+}
+
+#moz-logo {
+  position: absolute;
+  z-index: 1;
+  top: 120px;
+  right: 5px;
+}
+
+#embed-code {
+  width: 645px;
+  height: 200px;
+  border: 2px solid #888;
+  border-radius: 2px;
+  max-width: 645px;
+}
+
+.rollout-content {
+  font-size: 60%;
+  margin-left: 10px;
+  border: 2px solid #333;
+  border-radius: 6px;
+  padding: 5px;
+  width: 650px;
+}
+
+.option-container:hover {
+  cursor: pointer;
+}
+
+.option-checkbox {
+  font-size: 100%;
+}
+
+.option-text:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+video {
+  border: 2px solid #888;
+  border-radius: 6px;
+}
