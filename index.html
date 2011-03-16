@@ -8,9 +8,37 @@
       $(document).ready(function() {
         var video;
 
+        var support = [
+          {
+            title: 'iOS/Safari/IE',
+            id: 'ios-ie',
+            format: 'mp4',
+            blurb: 'iOS browsers (iPods, iPads, etc.), Safari, and IE all support the <a href="http://en.wikipedia.org/wiki/MPEG-4_Part_14">MP4</a> file format.',
+            textbox: true,
+            state: false
+          },
+          {
+            title: 'Chrome/Firefox',
+            id: 'chrome-firefox',
+            format: 'webm',
+            blurb: 'Chrome and Firefox support the <a href="http://en.wikipedia.org/wiki/WebM">WebM</a> file format. Currently, OGV/OGG files are also supported, but WebM is becoming more preferable.',
+            textbox: true,
+            state: false
+          },
+          {
+            title: 'Firefox/Opera',
+            id: 'firefox-opera',
+            format: 'ogv',
+            blurb: 'The <a href="http://en.wikipedia.org/wiki/Theora">Theora OGV/OGG</a> file format is currently supported by Chrome, Firefox, and Opera browsers. It is a free, lossy compression format.',
+            textbox: true,
+            state: false
+          }
+        ];
+
         var options = [
           {
             title: 'Controls',
+            blurb: 'Graphical controls such as Play, Pause, and a Timeline will be visible on top of the video.',
             include: function(video) {
               video.controls = 'true';
             },
@@ -21,11 +49,74 @@
           },
           {
             title: 'Autoplay',
+            blurb: 'After the page loads, the video will begin playing automatically (whenever possible).',
             include: function(video) {
               video.autoplay = 'true';
             },
             disclude: function(video) {
               video.autoplay = undefined;
+            },
+            state: false
+          },
+          {
+            title: 'Poster',
+            blurb: 'The image specified in the text box above will be shown before the video loads.',
+            textbox: true,
+            include: function(video) {
+              video.poster = this.textbox.value;
+            },
+            disclude: function(video) {
+              video.removeAttribute('poster');
+            },
+            state: false
+          },
+          {
+            title: 'Width',
+            blurb: 'Width of the video object.',
+            textbox: 200,
+            include: function(video) {
+              video.width = this.textbox.value;
+            },
+            disclude: function(video) {
+              video.removeAttribute('width');
+            },
+            state: true
+          },
+          {
+            title: 'Height',
+            blurb: 'Height of the video object.',
+            textbox: 100,
+            include: function(video) {
+              video.height = this.textbox.value;
+            },
+            disclude: function(video) {
+              video.removeAttribute('height');
+            },
+            state: true
+          },
+        ];
+
+        var libs = [
+          {
+            title: 'popocorn.js',
+            src: 'popcorn.js',
+            blurb: 'A library which allows simplistic video timeline event sequencing for meta-data like wiki pages or google maps. <a href="http://popcornjs.org">popcornjs.org</a>',
+            script: function(video) {
+            },
+            state: false
+          },
+          {
+            title: 'video.js',
+            src: 'video.js',
+            blurb: 'Video JS <a href="http://videojs.com/">videojs.com</a>',
+            script: function(video) {
+            },
+            state: false
+          },
+          {
+            title: 'candy.js',
+            src: 'candy.js',
+            script: function(video) {
             },
             state: false
           },
@@ -37,13 +128,18 @@
           source.src = document.getElementById('video-source').value;
           video.appendChild(source);
           $('.video-source-textbox').each(function(i,e) {
-            if (this.value) {
+            if (this.value && !this.disabled) {
+              var kids = $(video).children('source');
+              for (var i=0; i<kids.length; ++i) {
+                if (kids[i].src === this.value) {
+                  return;
+                } //if
+              } //for
               source = document.createElement('source');
               source.src = this.value;
               video.appendChild(source);
             } //if
           });
-          video.innerHTML += 'Your browser does not support the video tag.';
         } //createSources
 
         function createOutput(newVideo) {
@@ -66,54 +162,173 @@
               option.disclude(video);
             } //if
           } //for
-          var output = div.innerHTML;
-          output = output.replace(/ tabindex="\d"/i, '');
+          var spc = '  ';
+          var output = '<html>\n'+spc+'<head>'
+          for (var i=0; i<libs.length; ++i) {
+            if (libs[i].state) {
+              output += '\n'+spc+spc+'<script src="'+libs[i].src+'" type="text/javascript"><\/script>';
+            } //if
+          } //for
+          video.removeAttribute('tabindex');
+          output += '\n'+spc+'</head>\n'+spc+'<body>';
+          var videoHTML = div.innerHTML;
+          videoHTML = videoHTML.replace(/<source/gi, '\n'+spc+spc+spc+'<source');
+          videoHTML = videoHTML.replace(/<video/gi, '\n'+spc+spc+'<video');
+          videoHTML = videoHTML.replace(/<\/video>/gi,'\n'+spc+spc+spc+'Your browser does not support the video tag.\n'+spc+spc+'<\/video>');
+          output += videoHTML;
+          output += '\n'+spc+'</body>\n</html>';
           textarea.innerHTML = output;
         } //createOutput
 
+        function createCheckbox(element, option, inputBox, extraClickFunction) {
+          extraClickFunction = extraClickFunction || function(){};
+          var checkbox = document.createElement('span');
+          checkbox.className = 'option-checkbox';
+          checkbox.innerHTML = '&nbsp;&#x2713; &nbsp;';
+          checkbox.style.color = '#111';
+          element.appendChild(checkbox);
+          var text = document.createElement('span');
+          text.innerHTML = option.title;
+          text.className = 'option-text';
+          element.appendChild(text);
+          function clickFn(forceState) {
+            if(forceState === false || (forceState === undefined && option.state === true)) {
+              checkbox.style.color = '#111';
+              option.state = false;
+            }
+            else if (forceState === true || (forceState === undefined && option.state === false)) {
+              checkbox.style.color = '#aaa';
+              option.state = true;
+            } //if
+            if(inputBox) {
+              inputBox.disabled = !option.state;
+            } //if
+          } //clickFn
+          $(text).click(function(e) {
+            clickFn();
+            extraClickFunction();
+            createOutput();
+          });
+          clickFn(option.state);
+        } //createCheckbox
+
+        function createMoreButton() {
+          var moreButton = document.createElement('span');
+          moreButton.className = 'more-button';
+          moreButton.innerHTML = '[info]';
+          return moreButton;
+        } //createMoreButton
+
+        function createBlurb(element, option, moreButton) {
+          var blurb = document.createElement('div');
+          blurb.innerHTML = option.blurb;
+          blurb.className = 'support-blurb';
+          $(blurb).hide();
+          $(moreButton).click(function() {
+            $(blurb).toggle('fast');
+          });
+          return blurb;
+        } //createBlurb
+
+        function createInputBox(class, id, value) {
+          var inputBox = document.createElement('input');
+          inputBox.type = 'text';
+          inputBox.className = class;
+          inputBox.id = id;
+          if (value && value !== true) {
+            inputBox.value = value;
+          } //if
+          return inputBox;
+        } //createInputBox
+
+        $('#options-rollout').append('<div class="option-title">Video Options</div>');
+
         for (var i=0; i<options.length; ++i) {
+          var option = options[i];
+          var element = document.createElement('div');
+          element.className = 'option-container';
+          var inputBox;
+          if (option.textbox) {
+            inputBox = createInputBox('textbox', 'option-'+option.title, option.textbox);
+            $(inputBox).change(createOutput);
+            element.appendChild(inputBox);
+            option.textbox = inputBox;
+          } //if
+          createCheckbox(element, option, inputBox);
+          if (option.blurb) {
+            var moreButton = createMoreButton(element, option);
+            var blurb = createBlurb(element, option, moreButton);
+            element.appendChild(moreButton);
+            element.appendChild(document.createElement('br'));
+            element.appendChild(blurb);
+          } //if
+          $('#options-rollout').append(element);
+        } //for
+
+        $('#options-rollout').append('<div class="option-title">Libraries</div>');
+
+        for (var i=0; i<libs.length; ++i) {
+          var option = libs[i];
+          var element = document.createElement('div');
+          element.className = 'option-container';
+          createCheckbox(element, option);
+          if (option.blurb) {
+            var moreButton = createMoreButton(element, option);
+            var blurb = createBlurb(element, option, moreButton);
+            element.appendChild(moreButton);
+            if (option.textbox) {
+              element.appendChild(createInputBox('textbox', 'lib-'+option.title, option.textbox));
+            } //if
+            element.appendChild(document.createElement('br'));
+            element.appendChild(blurb);
+          } //if
+          $('#options-rollout').append(element);
+        } //for
+
+        for (var i=0; i<support.length; ++i) {
           (function() {
-            var option = options[i];
             var element = document.createElement('div');
-            element.className = 'option-container';
-            var checkbox = document.createElement('span');
-            checkbox.className = 'option-checkbox';
-            checkbox.innerHTML = '&nbsp;&#x2713; &nbsp;';
-            checkbox.style.color = '#111';
-            element.appendChild(checkbox);
-            var text = document.createElement('span');
-            text.innerHTML = option.title;
-            text.className = 'option-text';
-            element.appendChild(text);
-            function clickFn(forceState) {
-              if(forceState === false || (forceState === undefined && option.state === true)) {
-                checkbox.style.color = '#111';
-                option.state = false;
-              }
-              else if (forceState === true || (forceState === undefined && option.state === false)) {
-                checkbox.style.color = '#aaa';
-                option.state = true;
-              } //if
-            } //clickFn
-            $(element).click(function() {
-              clickFn();
-              createOutput();
+            var option = support[i];
+            element.className = 'video-source';
+            var inputBox = createInputBox('textbox video-source-textbox', 'video-source-' + option.id, option.textbox);
+            createCheckbox(element, option, inputBox, function() {
+              createSources();
             });
-            clickFn(option.state);
-            $('#options-rollout').append(element);
+            inputBox.disabled = !option.state;
+            var moreButton = createMoreButton(element, option);
+            var blurb = createBlurb(element, option, moreButton);
+            element.appendChild(moreButton);
+            element.appendChild(inputBox);
+            element.appendChild(document.createElement('br'));
+            element.appendChild(blurb);
+            $('#support-rollout').append(element);
+            option.input = inputBox;
           })();
         } //for
 
         $('.rollout-container').each(function(i, e) {
           var content = $(this).children('.rollout-content');
           var button = $(this).children('.rollout-button');
-          //content.hide();
+          content.hide();
           button.click(function() {
             content.toggle('fast');
           });
         });
 
+        function adjustSources() {
+          var src = document.getElementById('video-source').value;
+          var idx = src.lastIndexOf('.');
+          if (idx > -1) {
+            var root = src.substr(0, idx);
+            var ext = src.substr(idx + 1);
+            for (var i=0; i<support.length; ++i) {
+              support[i].input.value = root + '.' + support[i].format;
+            } //for
+          } //if
+        } //adjustSources
+
         $('.video-source-textbox').change(function() {
+          adjustSources();
           createSources();
           createOutput();
         });
@@ -122,6 +337,7 @@
           createOutput();
         });
 
+        adjustSources();
         createOutput(true);
       });
     </script>
@@ -135,10 +351,16 @@
       <ol>
         <li class="rollout-container">
           <a class="rollout-button">Enter a URL to Embed</a>: <input type="text" id="video-source" value="http://popcornjs.org/tryme.ogv" /><br />
-          <div class="rollout-content">
-            <div class="video-source">iOS Support <input type="text" class="video-source-textbox" id="video-source-ios"/></div>
-            <div class="video-source">Chrome/Firefox Support <input type="text" class="video-source-textbox" id="video-source-chrome-ff"/></div>
-            <div class="video-source">Firefox/Opera Support <input type="text" class="video-source-textbox" id="video-source-ff-opera"/></div>
+          <div id="support-rollout" class="rollout-content">
+            <span class='rollout-note'>
+              <b>About video encoding:</b> Different browsers support different video file formats. In other words, Chrome will play OGV and WebM video files, while Safari will only play MP4 files.<br />
+              Luckily, if you're not an expert at video encoding, you may consider one of these methods:
+              <ul>
+                <li><b><a href="http://www.mirovideoconverter.com/">miro</a>: </b>Available for Windows and OSX, miro is a drag-and-drop application that converts video. It's easy to use and highly recommended.</li>
+                <li><b><a href="http://vid.ly/">vid.ly</a>: </b>Currently in beta, vid.ly will be a website devoted to encoding videos easily.</li>
+                <li><b><a href="http://www.ffmpeg.org/">ffmpeg</a>: </b>Not the easiest option, but certainly one of the most powerful; ffmpeg is available on all systems and is normally used via the command line, but several third-party GUI packages exist.</li>
+              </ul>
+            </span>
           </div>
         </li>
         <li class="rollout-container">
