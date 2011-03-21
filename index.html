@@ -101,7 +101,19 @@
             title: 'popocorn.js',
             src: 'popcorn.js',
             blurb: 'A library which allows simplistic video timeline event sequencing for meta-data like wiki pages or google maps. <a href="http://popcornjs.org">popcornjs.org</a>',
+            textbox: 'timeline.json',
+            onload: function(video) {
+              return 'var popcorn = Popcorn(\'#video-element\');'
+            },
             script: function(video) {
+            },
+            include: function(video) {
+              if (this.textbox.value) {
+                video.setAttribute('data-timeline-sources', this.textbox.value);
+              } //if
+            },
+            disclude: function(video) {
+              video.removeAttribute('data-timeline-sources');
             },
             state: false
           },
@@ -150,6 +162,7 @@
               div.removeChild(div.children[0]);
             } //if
             video = document.createElement('video');
+            video.id = 'video-element';
             createSources();   
             div.appendChild(video);
           } //if
@@ -165,10 +178,27 @@
           var spc = '  ';
           var output = '<html>\n'+spc+'<head>'
           for (var i=0; i<libs.length; ++i) {
-            if (libs[i].state) {
+            if (libs[i].state && libs[i].include) {
+              libs[i].include(video);
+            }
+            else if (libs[i].state === false && libs[i].disclude){
+              libs[i].disclude(video);
+            } //if
+            if (libs[i].state && libs[i].src) {
               output += '\n'+spc+spc+'<script src="'+libs[i].src+'" type="text/javascript"><\/script>';
             } //if
           } //for
+
+          output += '\n'+spc+spc+'<script>';
+          output += '\n'+spc+spc+spc+'document.addEventListener(\'DOMContentLoaded\', function(e) {';
+          for (var i=0; i<libs.length; ++i) {
+            if (libs[i].state && libs[i].onload) {
+              output += '\n'+spc+spc+spc+spc+libs[i].onload(video);
+            } //if
+          } //for
+          output += '\n'+spc+spc+spc+'}, false);';
+          output += '\n'+spc+spc+'<\/script>';
+
           video.removeAttribute('tabindex');
           output += '\n'+spc+'</head>\n'+spc+'<body>';
           var videoHTML = div.innerHTML;
@@ -268,29 +298,37 @@
         $('#options-rollout').append('<div class="option-title">Libraries</div>');
 
         for (var i=0; i<libs.length; ++i) {
-          var option = libs[i];
-          var element = document.createElement('div');
-          element.className = 'option-container';
-          createCheckbox(element, option);
-          if (option.blurb) {
-            var moreButton = createMoreButton(element, option);
-            var blurb = createBlurb(element, option, moreButton);
-            element.appendChild(moreButton);
+          (function() {
+            var option = libs[i];
+            var element = document.createElement('div');
+            element.className = 'option-container';
+            var textbox;
             if (option.textbox) {
-              element.appendChild(createInputBox('textbox', 'lib-'+option.title, option.textbox));
+              var textbox = createInputBox('textbox', 'lib-'+option.title, option.textbox);
+              $(textbox).change(createOutput);
+              element.appendChild(textbox);
+              option.textbox = textbox;
             } //if
-            element.appendChild(document.createElement('br'));
-            element.appendChild(blurb);
-          } //if
-          $('#options-rollout').append(element);
+            createCheckbox(element, option, textbox);
+            if (option.blurb) {
+              var moreButton = createMoreButton(element, option);
+              var blurb = createBlurb(element, option, moreButton);
+              element.appendChild(moreButton);
+              element.appendChild(document.createElement('br'));
+              element.appendChild(blurb);
+            } //if
+            $('#options-rollout').append(element);
+          })();
         } //for
 
+        var videoSourceTextboxes = [];
         for (var i=0; i<support.length; ++i) {
           (function() {
             var element = document.createElement('div');
             var option = support[i];
             element.className = 'video-source';
             var inputBox = createInputBox('textbox video-source-textbox', 'video-source-' + option.id, option.textbox);
+            videoSourceTextboxes.push(inputBox);
             createCheckbox(element, option, inputBox, function() {
               createSources();
             });
@@ -334,6 +372,8 @@
         });
 
         $('#video-source').change(function() {
+          adjustSources();
+          createSources();
           createOutput();
         });
 
