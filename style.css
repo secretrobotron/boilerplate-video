@@ -41,6 +41,16 @@ input[type=checkbox] {
   left: 50px;
 }
 
+#preview {
+  position: absolute;
+  left: 800px;
+  top: 300px;
+}
+
+.fake-button:hover {
+  cursor: pointer;
+}
+
 .rollout-button:hover {
   text-decoration: underline;
   cursor: pointer;
@@ -87,6 +97,19 @@ input[type=checkbox] {
   border: 2px solid #888;
   border-radius: 2px;
   max-width: 645px;
+}
+
+#steps {
+  white-space: nowrap;
+  position: relative;
+  width: 800px;
+}
+
+.rollout-container {
+  white-space: normal;
+  position: absolute;
+  width: 800px;
+  top: 0px;
 }
 
 .rollout-content {

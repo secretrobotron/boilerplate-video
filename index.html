@@ -48,6 +48,19 @@
             state: true
           },
           {
+            title: 'Autoload',
+            blurb: 'The video will begin to load its content automatically and as soon as possible.',
+            include: function(video) {
+              video.setAttribute('autobuffer', true);
+              video.preload = 'auto';
+            },
+            disclude: function(video) {
+              video.removeAttribute('autobuffer');
+              video.removeAttribute('preload');
+            },
+            state: false
+          },
+          {
             title: 'Autoplay',
             blurb: 'After the page loads, the video will begin playing automatically (whenever possible).',
             include: function(video) {
@@ -344,6 +357,7 @@
           })();
         } //for
 
+        /*
         $('.rollout-container').each(function(i, e) {
           var content = $(this).children('.rollout-content');
           var button = $(this).children('.rollout-button');
@@ -352,6 +366,7 @@
             content.toggle('fast');
           });
         });
+        */
 
         function adjustSources() {
           var src = document.getElementById('video-source').value;
@@ -377,6 +392,51 @@
           createOutput();
         });
 
+        $('.rollout-container').each(function(i, e) {
+          if (i>0) {
+            $(e).hide();
+          } //if
+        });
+
+        $('#back-button').fadeTo(100, 0.5);
+        var slideIndex = 0;
+        $('#next-button').click(function(e) {
+          var containers = $('.rollout-container');
+          if (slideIndex < containers.length - 1) {
+            $('#back-button').fadeTo(100, 1);
+            $(containers[slideIndex]).fadeTo(200, 0);
+            ++slideIndex;
+            $(containers[slideIndex]).show();
+            $(containers[slideIndex]).fadeTo(200, 1);
+            //$(containers[slideIndex]).offset({left:window.innerWidth});
+            //$(containers[slideIndex]).animate({left:0}, 200);
+            if (slideIndex === containers.length - 1) {
+              $('#next-button').fadeTo(100, 0.5);
+            } //if
+            $(containers[slideIndex-1]).delay(200).hide();
+          }
+          else {
+          } //if
+        });
+        $('#back-button').click(function(e) {
+          var containers = $('.rollout-container');
+          if (slideIndex > 0) {
+            $('#next-button').fadeTo(200, 1);
+            $(containers[slideIndex]).fadeTo(200, 0);
+            --slideIndex;
+            $(containers[slideIndex]).show();
+            $(containers[slideIndex]).fadeTo(200, 1);
+            //$(containers[slideIndex]).offset({left:-$(containers[slideIndex]).width()-50});
+            //$(containers[slideIndex]).animate({left:0}, 200);
+            if (slideIndex === 0) {
+              $('#back-button').fadeTo(200, 0.5);
+            } //if
+            $(containers[slideIndex+1]).delay(200).hide();
+          }
+          else {
+          } //if
+        });
+
         adjustSources();
         createOutput(true);
       });
@@ -388,9 +448,11 @@
       <h2>In 3 Easy Steps</h2>
     </div>
     <div id="main-list" class="foreground">
-      <ol>
-        <li class="rollout-container">
-          <a class="rollout-button">Enter a URL to Embed</a>: <input type="text" id="video-source" value="http://popcornjs.org/tryme.ogv" /><br />
+      <a id="back-button" class="fake-button">&lt;&lt;BACK</a>&nbsp;
+      <a id="next-button" class="fake-button">NEXT&gt;&gt;</a>
+      <div id="steps">
+        <div class="rollout-container">
+          1. <a class="rollout-button">Enter the video's location</a>: <input type="text" id="video-source" value="http://popcornjs.org/tryme.ogv" /><br />
           <div id="support-rollout" class="rollout-content">
             <span class='rollout-note'>
               <b>About video encoding:</b> Different browsers support different video file formats. In other words, Chrome will play OGV and WebM video files, while Safari will only play MP4 files.<br />
@@ -402,19 +464,19 @@
               </ul>
             </span>
           </div>
-        </li>
-        <li class="rollout-container">
-          <a class="rollout-button">Choose Your Options</a>
+        </div>
+        <div class="rollout-container">
+          2. <a class="rollout-button">Choose Your Options</a>
           <div id="options-rollout" class="rollout-content">
           </div>
-        </li>
-        <li class="rollout-container">
-          <a class="rollout-button">Copy &amp; Paste the Code</a>
+        </div>
+        <div class="rollout-container">
+          3. <a class="rollout-button">Copy &amp; Paste the Code</a>
           <div class="rollout-content">
             <textarea id="embed-code"></textarea>
           </div>
-        </li>
-      </ol>
+        </div>
+      </div>
     </div>
     <div id="preview"><span>Preview</span><br /><div id="preview-viewport"></div></div>
     <!--<a href="http://mozilla.org"><img id="moz-dino" src="images/mozilla-dino.png" /></a>-->
