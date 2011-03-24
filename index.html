@@ -398,22 +398,22 @@
           } //if
         });
 
+        var fadeTime = 500;
         $('#back-button').fadeTo(100, 0.5);
         var slideIndex = 0;
         $('#next-button').click(function(e) {
           var containers = $('.rollout-container');
           if (slideIndex < containers.length - 1) {
             $('#back-button').fadeTo(100, 1);
-            $(containers[slideIndex]).fadeTo(200, 0);
+            $(containers[slideIndex]).fadeTo(fadeTime, 0);
             ++slideIndex;
+            $(containers[slideIndex]).css({ opacity: 0 });
             $(containers[slideIndex]).show();
-            $(containers[slideIndex]).fadeTo(200, 1);
-            //$(containers[slideIndex]).offset({left:window.innerWidth});
-            //$(containers[slideIndex]).animate({left:0}, 200);
+            $(containers[slideIndex]).fadeTo(fadeTime, 1);
             if (slideIndex === containers.length - 1) {
               $('#next-button').fadeTo(100, 0.5);
             } //if
-            $(containers[slideIndex-1]).delay(200).hide();
+            $(containers[slideIndex-1]).delay(fadeTime+100).hide();
           }
           else {
           } //if
@@ -421,17 +421,16 @@
         $('#back-button').click(function(e) {
           var containers = $('.rollout-container');
           if (slideIndex > 0) {
-            $('#next-button').fadeTo(200, 1);
-            $(containers[slideIndex]).fadeTo(200, 0);
+            $('#next-button').fadeTo(100, 1);
+            $(containers[slideIndex]).fadeTo(fadeTime, 0);
             --slideIndex;
+            $(containers[slideIndex]).css({ opacity: 0 });
             $(containers[slideIndex]).show();
-            $(containers[slideIndex]).fadeTo(200, 1);
-            //$(containers[slideIndex]).offset({left:-$(containers[slideIndex]).width()-50});
-            //$(containers[slideIndex]).animate({left:0}, 200);
+            $(containers[slideIndex]).fadeTo(fadeTime, 1);
             if (slideIndex === 0) {
-              $('#back-button').fadeTo(200, 0.5);
+              $('#back-button').fadeTo(100, 0.5);
             } //if
-            $(containers[slideIndex+1]).delay(200).hide();
+            $(containers[slideIndex+1]).delay(fadeTime+100).hide();
           }
           else {
           } //if
@@ -452,8 +451,10 @@
       <a id="next-button" class="fake-button">NEXT&gt;&gt;</a>
       <div id="steps">
         <div class="rollout-container">
-          1. <a class="rollout-button">Enter the video's location</a>: <input type="text" id="video-source" value="http://popcornjs.org/tryme.ogv" /><br />
+          <span class="number">#1</span>
+          <span class="rollout-button">Video Encoding &amp; Location</span>
           <div id="support-rollout" class="rollout-content">
+            <input type="text" id="video-source" value="http://popcornjs.org/tryme.ogv" /><br />
             <span class='rollout-note'>
               <b>About video encoding:</b> Different browsers support different video file formats. In other words, Chrome will play OGV and WebM video files, while Safari will only play MP4 files.<br />
               Luckily, if you're not an expert at video encoding, you may consider one of these methods:
@@ -466,12 +467,14 @@
           </div>
         </div>
         <div class="rollout-container">
-          2. <a class="rollout-button">Choose Your Options</a>
+          <span class="number">#2</span>
+          <span class="rollout-button">Choose Your Options</span>
           <div id="options-rollout" class="rollout-content">
           </div>
         </div>
         <div class="rollout-container">
-          3. <a class="rollout-button">Copy &amp; Paste the Code</a>
+          <span class="number">#3</span>
+          <span class="rollout-button">Copy &amp; Paste the Code</span>
           <div class="rollout-content">
             <textarea id="embed-code"></textarea>
           </div>
