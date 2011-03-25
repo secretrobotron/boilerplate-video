@@ -41,6 +41,11 @@ input[type=checkbox] {
   left: 50px;
 }
 
+textarea {
+  background: transparent;
+  color: #fff;
+}
+
 #preview {
   position: absolute;
   left: 800px;
@@ -51,9 +56,19 @@ input[type=checkbox] {
   cursor: pointer;
 }
 
-.rollout-button:hover {
-  text-decoration: underline;
-  cursor: pointer;
+.number {
+  z-index: -1;
+  opacity: 30%;
+  font-size: 800%;
+  position: absolute;
+  right: 0.2em;
+  top: -0.4em;
+  text-shadow: 0px 0px 10px #333;
+  color: transparent;
+}
+
+.rollout-button {
+  font-weight: bold;
 }
 
 .rollout-note {
@@ -93,9 +108,9 @@ input[type=checkbox] {
 
 #embed-code {
   width: 645px;
-  height: 200px;
+  height: 300px;
   border: 2px solid #888;
-  border-radius: 2px;
+  border-radius: 6px;
   max-width: 645px;
 }
 
@@ -115,7 +130,6 @@ input[type=checkbox] {
 .rollout-content {
   font-size: 60%;
   margin-left: 10px;
-  border: 2px solid #333;
   border-radius: 6px;
   padding: 5px;
   width: 650px;
